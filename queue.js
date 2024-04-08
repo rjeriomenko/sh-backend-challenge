@@ -4,9 +4,24 @@ const LinkedList = require("./linkedList");
 class Queue {
   #linkedList;
   
-  constructor() {
+  constructor(initialQueue = []) {
     this.#linkedList = new LinkedList.LinkedList();
     this.nodeObj = {};
+
+    if (initialQueue.length) {
+      this.setDefaultQueue(initialQueue);
+    }
+  }
+
+  // Used to set default queue for testing
+  setDefaultQueue = (initialQueue) => {
+    for (const i in initialQueue) {
+      const newNode = new LinkedList.Node(initialQueue[i], this.#linkedList.tail);
+      if (this.#linkedList.tail) this.#linkedList.tail.next = newNode;
+      this.#linkedList.tail = newNode;
+      this.nodeObj[this.#linkedList.size] = newNode;
+      this.#linkedList.size++;
+    }
   }
   
   appendSong = (songId) => { // Refer to songs by songId because it is problematic to use song names
@@ -14,10 +29,11 @@ class Queue {
     if (this.#linkedList.tail) this.#linkedList.tail.next = newNode;
     this.#linkedList.tail = newNode;
     
-    this.nodeObj[this.#linkedList.length] = newNode;
-    this.#linkedList.length++;
+    this.nodeObj[this.#linkedList.size] = newNode;
+    this.#linkedList.size++;
   }
 
+  // REMOVE FROM THE BACK OR REMOVE REFERENCES AND KEEP GHOST NODES 
   removeSong = (queueIndex, songId) => {
     // Check if song exists at the chosen index
     if (this.#linkedList[queueIndex]?.songId == songId) {
@@ -27,7 +43,7 @@ class Queue {
       if (nodeToRemove.next) nodeToRemove.next.prev = nodeToRemove.prev;
 
       delete this.nodeObj[queueIndex];
-      this.#linkedList.length--;
+      this.#linkedList.size--;
     }
   }
 
@@ -51,7 +67,7 @@ class Queue {
 
   returnQueue = () => {
     const queueArray = [];
-    for (let i = 0; i < this.#linkedList.length; i++) {
+    for (let i = 0; i < this.#linkedList.size; i++) {
       queueArray.push(this.nodeObj[i].songId);
     }
     return queueArray;
