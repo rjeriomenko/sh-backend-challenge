@@ -20,10 +20,25 @@ functionalities.
 remove all entries of that song
 5. The state must be maintained in memory
 
-# Notes
+# Notes / Start of Readme Instructions
 
-# Explain solution here WELL bc your approach NEEDS explaining
+### To install dependencies
+``js
+    npm i
+``
 
-## Practice adding additional features
-## Good annotation throughout
-## Talk about time complexity of every function
+### To run tests
+``js
+    npm test
+``
+
+### To start server on port 3000
+``js
+    npm start
+``
+
+## Explain solution here WELL bc your approach NEEDS explaining
+
+### Practice adding additional features
+### Need Good annotation throughout
+### Talk about time complexity of every function
