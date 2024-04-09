@@ -19,3 +19,11 @@ functionalities.
 4. When removing songs from the queue, removing the same song should not
 remove all entries of that song
 5. The state must be maintained in memory
+
+# Notes
+
+# Explain solution here WELL bc your approach NEEDS explaining
+
+## Practice adding additional features
+## Good annotation throughout
+## Talk about time complexity of every function

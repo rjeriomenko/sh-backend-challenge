@@ -2,8 +2,8 @@ const express = require('express');
 const queuesRouter = express.Router();
 const Queue = require('../queue');
 
-const createQueuesRouter = (initialQueue = []) => {
-  const queue = new Queue(initialQueue);
+const createQueuesRouter = () => {
+  const queue = new Queue();
   
   // Optimize for "adding" and "removing" songs
   // Goals:
