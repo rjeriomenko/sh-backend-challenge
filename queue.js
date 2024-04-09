@@ -76,10 +76,12 @@ class Queue {
 
   // Resets order of the linked list index 
   sortLinkedList = () => {
-    let currentNode = this.#linkedList.tail;
-    for (let i = this.#linkedList.size; i > 0; i--) {
-      this.#nodeIndex[i - 1] = currentNode;
-      currentNode = currentNode.prev;
+    if (!this.#sortedIndex) {
+      let currentNode = this.#linkedList.tail;
+      for (let i = this.#linkedList.size; i > 0; i--) {
+        this.#nodeIndex[i - 1] = currentNode;
+        currentNode = currentNode.prev;
+      }
     }
   }
 
@@ -87,9 +89,15 @@ class Queue {
   returnQueue = () => {
     const songIdArray = [];
     for (let i = 0; i < this.#linkedList.size; i++) {
-      songIdArray.push(this.nodeObj[i].songId);
+      songIdArray.push(this.#nodeIndex[i].songId);
     }
     return songIdArray;
+  }
+
+  resetQueue = () => {
+    this.#linkedList = new LinkedList.LinkedList();
+    this.#nodeIndex = {};
+    this.#sortedIndex = true;
   }
 }
 

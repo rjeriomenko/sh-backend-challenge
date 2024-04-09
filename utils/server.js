@@ -1,10 +1,10 @@
 const express = require('express');
-const createQueuesRouter = require('./queuesRouter');
+const queuesRouter = require('./queuesRouter');
 
-const createServer = (initialQueue = []) => {
+const createServer = () => {
   const app = express();
   app.use(express.json());
-  app.use('/api/v1', createQueuesRouter(initialQueue));
+  app.use('/api/v1', queuesRouter.createQueuesRouter());
   return app;
 }
 

@@ -1,13 +1,17 @@
 const request = require('supertest');
 const createServer = require('../utils/server');
+const app = createServer();
+const queuesRouter = require('../utils/queuesRouter');
+const QUEUE = queuesRouter.QUEUE;
 const APIURL = '/api/v1/queues';
 
 describe("queue", () => {
-  describe.skip("get queue route", () => {
+  beforeEach(() => {
+    QUEUE.resetQueue();
+  });
+  describe("get queue route", () => {
     describe("given there are no songs in the queue", () => {
       it("should return an empty array", async () => {
-        const app = createServer();
-
         const { body, statusCode } = await request(app).get(APIURL);
 
         expect(statusCode).toBe(200);
@@ -17,8 +21,8 @@ describe("queue", () => {
 
     describe("given there are songs in the queue", () => {
       it("should return an array of songs", async () => {
-        const initialQueue = ["songid1, songid2, songid3"];
-        const app = createServer(initialQueue);
+        const initialQueue = ["songId1", "songId2", "songId3"];
+        QUEUE.setInitialQueue(initialQueue);
 
         const { body, statusCode } = await request(app).get(APIURL);
 
@@ -28,10 +32,9 @@ describe("queue", () => {
     });
   });
 
-  describe.skip("post queue route", () => {
+  describe("post queue route", () => {
     describe("given client is adding one song to empty queue", () => {
       it("should add song to queue", async () => {
-        const app = createServer();
         const postPayload = { "songIds": ["songId1"] };
         const expectedGetResponse = ["songId1"];
 
@@ -48,7 +51,7 @@ describe("queue", () => {
     describe("given client is adding one song to pre-populated queue", () => {
       it("should add song to queue", async () => {
         const initialQueue = ["songId1", "songId2", "songId3"];
-        const app = createServer(initialQueue);
+        QUEUE.setInitialQueue(initialQueue);
         const postPayload = { "songIds": ["songId4"] };
         const expectedGetResponse = ["songId1", "songId2", "songId3", "songId4"];
 
@@ -64,7 +67,6 @@ describe("queue", () => {
 
     describe("given client is adding multiple songs to empty queue", () => {
       it("should add all songs to queue", async () => {
-        const app = createServer();
         const postPayload = { "songIds": ["songId4", "songId5", "songId6"] };
         const expectedGetResponse = ["songId4", "songId5", "songId6"];
 
@@ -81,7 +83,7 @@ describe("queue", () => {
     describe("given client is adding multiple songs to pre-populated queue", () => {
       it("should add all songs to queue", async () => {
         const initialQueue = ["songId1", "songId2", "songId3"];
-        const app = createServer(initialQueue);
+        QUEUE.setInitialQueue(initialQueue);
         const postPayload = { "songIds": ["songId4", "songId5", "songId6"] };
         const expectedGetResponse = ["songId1", "songId2", "songId3", "songId4", "songId5", "songId6"];
 
@@ -98,7 +100,7 @@ describe("queue", () => {
     describe("given client is adding multiples of the same song to a pre-populated queue", () => {
       it("should add all songs to queue", async () => {
         const initialQueue = ["songId1", "songId2", "songId3"];
-        const app = createServer(initialQueue);
+        QUEUE.setInitialQueue(initialQueue);
         const postPayload = { "songIds": ["songId3", "songId1", "songId2"] };
         const expectedGetResponse = ["songId1", "songId2", "songId3", "songId3", "songId1", "songId2"];
 
