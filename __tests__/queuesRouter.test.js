@@ -118,8 +118,18 @@ describe("queue", () => {
   describe("delete queue route", () => {
     describe("given client is removing one song from pre-populated queue", () => {
       it("should remove song from queue", async () => {
-        const app = createServer();
-        // TODO: test delete route
+        const initialQueue = ["songId1", "songId2", "songId3"];
+        QUEUE.setInitialQueue(initialQueue);
+        const deletePayload = { "songIndexesAndIds": { "1": "songId2" }};
+        const expectedGetResponse = ["songId1", "songId3"];
+
+        const deleteResponse = await request(app).delete(APIURL)
+          .send(deletePayload);
+        const getResponse = await request(app).get(APIURL);
+
+        expect(deleteResponse.status).toBe(204);
+        expect(getResponse.status).toBe(200);
+        expect(getResponse.body).toEqual(expectedGetResponse);
       });
     });
   });

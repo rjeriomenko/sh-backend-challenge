@@ -1,6 +1,7 @@
 class LinkedList {
   constructor() {
     this.tail = null;
+    this.head = null;
     this.size = 0;
     this.maxIndex = 0;
   }

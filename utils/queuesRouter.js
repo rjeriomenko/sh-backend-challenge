@@ -10,7 +10,6 @@ const createQueuesRouter = () => {
   // O(1) Remove songs from queue using indexes and song identifiers
 
   queuesRouter.get('/queues', (req, res) => {
-    console.log(QUEUE.returnQueue());
     res.status(200).json(QUEUE.returnQueue());
   })
     
@@ -21,8 +20,9 @@ const createQueuesRouter = () => {
   });
   
   queuesRouter.delete('/queues', (req, res) => {
-    const { songIds, queueIndexes } = req.body; 
-    QUEUE.dequeueSongs(songIds, queueIndexes);
+    const { songIndexesAndIds } = req.body; 
+    QUEUE.dequeueSongs(songIndexesAndIds);
+    res.status(204).send();
   });
 
   return queuesRouter;
