@@ -37,8 +37,3 @@ remove all entries of that song
     npm start
 ``
 
-## Explain solution here WELL bc your approach NEEDS explaining
-
-### Practice adding additional features
-### Need Good annotation throughout
-### Talk about time complexity of every function

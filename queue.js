@@ -1,117 +1,87 @@
-// userId and queueId are not used in this implementation, but would be used in a database implementation
-const LinkedList = require("./linkedList");
+// The Queue class encapsulates and manages the underlying LinkedList and Node classes.
+// userId and queueId parameters are not used in this implementation, but 
+// would be used in a database implementation.
+const { LinkedList, Node } = require("./linkedList");
 
 class Queue {
-  #linkedList;
-  #nodeIndex;
-  #sortedIndex;
+  linkedList;
+  nodeIndexesAndNodes;
   
   constructor() {
-    this.#linkedList = new LinkedList.LinkedList();
-    this.#nodeIndex = {};
-    this.#sortedIndex = true;
-  }
-
-  // Used to set initial queue for testing
-  setInitialQueue = (initialQueue) => {
-    for (const songId of initialQueue) {
-      // Make newNode.next explicitly null for defensive programming
-      const newNode = new LinkedList.Node(songId, this.#linkedList.tail, null);
-      if (this.#linkedList.tail) this.#linkedList.tail.next = newNode;
-      if (!this.#linkedList.head) this.#linkedList.head = newNode;
-      this.#linkedList.tail = newNode;
-      this.#nodeIndex[this.#linkedList.maxIndex] = newNode;
-      this.#linkedList.size++;
-      this.#linkedList.maxIndex++;
-    }
+    this.linkedList = new LinkedList();
+    this.nodeIndexesAndNodes = {};
   }
   
-  // Refer to songs by songId because it is problematic to use song names
+  // O(1)
+  // Append node with songId to end of queue, updating tail and head as needed.
+  // Songs are identified by their songId.
   appendSong = (songId) => {
-    const newNode = new LinkedList.Node(songId, this.#linkedList.tail, null); 
-    if (this.#linkedList.tail) this.#linkedList.tail.next = newNode;
-    if (!this.#linkedList.head) this.#linkedList.head = newNode;
-    this.#linkedList.tail = newNode;
+    const newNode = new Node(songId, this.linkedList.maxNodeIndex, this.linkedList.tail, null); 
+    if (this.linkedList.tail) this.linkedList.tail.next = newNode;
+    if (!this.linkedList.head) this.linkedList.head = newNode;
+    this.linkedList.tail = newNode;
     
-    this.#nodeIndex[this.#linkedList.maxIndex] = newNode;
-    this.#linkedList.size++;
-    this.#linkedList.maxIndex++;
+    this.nodeIndexesAndNodes[this.linkedList.maxNodeIndex] = newNode;
+    this.linkedList.size++;
+    this.linkedList.maxNodeIndex++;
   }
 
-  // Remove index key from nodeIndex and unlink associated node from linked list
-  removeSong = (songIndex, songId) => {
-    // Check if song exists at the chosen index for idempotency
-    if (this.#nodeIndex[songIndex]?.songId == songId) {
-      const nodeToRemove = this.#nodeIndex[songIndex];
-      if (this.#linkedList.tail == nodeToRemove) this.#linkedList.tail = nodeToRemove.prev;
-      if (this.#linkedList.head == nodeToRemove) this.#linkedList.head = nodeToRemove.next;
+  // O(1)
+  // Finds node that matches nodeIndex and nodeId, unlinks it from linked list,
+  // and then removes associated entry from nodeIndexesAndNodes.
+  removeSong = (nodeIndex, songId) => {
+    // Check if song exists at the chosen index for idempotency.
+    if (this.nodeIndexesAndNodes[nodeIndex]?.songId == songId) {
+      const nodeToRemove = this.nodeIndexesAndNodes[nodeIndex];
+      if (this.linkedList.tail == nodeToRemove) this.linkedList.tail = nodeToRemove.prev;
+      if (this.linkedList.head == nodeToRemove) this.linkedList.head = nodeToRemove.next;
       if (nodeToRemove.prev) nodeToRemove.prev.next = nodeToRemove.next;
       if (nodeToRemove.next) nodeToRemove.next.prev = nodeToRemove.prev;
 
-      delete this.#nodeIndex[songIndex];
-      this.#linkedList.size--;
-      this.#sortedIndex = false;
+      delete this.nodeIndexesAndNodes[nodeIndex];
+      this.linkedList.size--;
     }
   }
 
-  // O(1) appending songs * number of parameters
+  // O(n) where n is number of songs to enqueue.
+  // Accepts an array of songIds and passes them to appendSong.
   enqueueSongs = (songIds, userId, queueId) => {
-    // songIds is always an array, regardless of array length
-    // Provides simple, consistent parameter for appending songs
+    // songIds is always an array regardless of array length, which provides a
+    // simple data structure for appending multiple songs.
     for (const songId of songIds) {
       this.appendSong(songId);
     }
   }
 
-  // O(1) removing songs * number of parameters + O(n) sorting indexes -- which can be deferred
-  // Require both queueIndexes and songIds to ensure idempotency
-  // Will remove identical songs in positions 3, 4, 5 (idempotency failure) but not 3, 5, 7
-  dequeueSongs = (songIndexesAndIds, userId, queueId) => {
-    for (const [songIndex, songId] of Object.entries(songIndexesAndIds)) {
-      this.removeSong(songIndex, songId);
+  // O(n) where n is number of songs to dequeue.
+  // Accepts an object with { nodeIndex: songId } pairs and passes
+  // the pairs to removeSong.
+  // Pairs require both queueIndexes and songIds to ensure idempotency.
+  // Will remove identical songs in positions 3, 4, 5 (idempotency failure)
+  // but not 3, 5, 7.
+  dequeueSongs = (nodeIndexesAndSongIds, userId, queueId) => {
+    for (const [nodeIndex, songId] of Object.entries(nodeIndexesAndSongIds)) {
+      this.removeSong(nodeIndex, songId);
     }
-
-    // This line may or may not be needed, depending on the client-side playlist data structure
-    // This could be called elsewhere later, allowing immediate O(1) song removal from the linked list
-    this.sortLinkedList();
-
-    // failure route ?
-    // idempotency route ?
-    // success route ?
   }
 
-  // O(n)
-  // Resets order of the linked list index 
-  sortLinkedList = () => {
-    if (!this.#sortedIndex && this.#linkedList.size) {
-      this.#nodeIndex = {};
-      let currentNode = this.#linkedList.tail;
-      for (let i = this.#linkedList.size; i > 0; i--) {
-        this.#nodeIndex[i - 1] = currentNode;
-        currentNode = currentNode.prev;
-      }
-    }
-
-    this.#sortedIndex = true;
-  }
-
-  // O(n)
-  // Return all songs in queue as array
+  // O(n) where n is the size of the linked list.
+  // Return all songs in queue as an array of [index, songId] pairs.
+  // The array maintains the order from front of queue to back of queue,
+  // allowing the frontend to easily iterate through entries and maintain order.
   returnQueue = () => {
-    const songIdArray = [];
-    let currentNode = this.#linkedList.head;
-    for (let i = 0; i < this.#linkedList.size; i++) {
-      songIdArray.push(currentNode.songId);
+    const arrayOfNodeIndexesAndSongIds = [];
+    
+    let currentNode = this.linkedList.head;
+    for (let i = 0; i < this.linkedList.size; i++) {
+      arrayOfNodeIndexesAndSongIds.push([currentNode.nodeIndex, currentNode.songId]);
       currentNode = currentNode.next;
     }
-    return songIdArray;
-  }
 
-  resetQueue = () => {
-    this.#linkedList = new LinkedList.LinkedList();
-    this.#nodeIndex = {};
-    this.#sortedIndex = true;
+    return arrayOfNodeIndexesAndSongIds;
   }
 }
 
-module.exports = Queue;
+module.exports = {
+  Queue
+};
