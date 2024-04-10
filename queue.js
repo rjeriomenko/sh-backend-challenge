@@ -57,8 +57,8 @@ class Queue {
   // Accepts an object with { nodeIndex: songId } pairs and passes
   // the pairs to removeSong.
   // Pairs require both queueIndexes and songIds to ensure idempotency.
-  // Will remove identical songs in positions 3, 4, 5 (idempotency failure)
-  // but not 3, 5, 7.
+  // Will not remove more than one song with each nodeIndex/songId pair,
+  // which demonstrates good idempotency.
   dequeueSongs = (nodeIndexesAndSongIds, userId, queueId) => {
     for (const [nodeIndex, songId] of Object.entries(nodeIndexesAndSongIds)) {
       this.removeSong(nodeIndex, songId);
