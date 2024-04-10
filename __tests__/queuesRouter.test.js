@@ -5,7 +5,10 @@ const { LinkedList } = require("../linkedList");
 const { createApp } = require('../app');
 const { queue } = require('../dataStore');
 const app = createApp();
-const APIURL = '/api/v1/queues';
+const GETAPIURL = '/api/v1/queues';
+const POSTAPIURL = '/api/v1/queues/add-song';
+const DELETEAPIURL = '/api/v1/queues/remove-song';
+
 
 // Used to clear queue before every test
 clearQueue = () => {
@@ -22,7 +25,7 @@ describe("queue", () => {
   describe("get queue route", () => {
     describe("given there are no songs in the queue", () => {
       it("should return an empty array", async () => {
-        const { body, statusCode } = await request(app).get(APIURL);
+        const { body, statusCode } = await request(app).get(GETAPIURL);
 
         expect(statusCode).toBe(200);
         expect(body).toEqual({ "nodeIndexesAndSongIds": [] });
@@ -39,7 +42,7 @@ describe("queue", () => {
         };
         queue.enqueueSongs(initialQueue);
 
-        const { body, statusCode } = await request(app).get(APIURL);
+        const { body, statusCode } = await request(app).get(GETAPIURL);
 
         expect(statusCode).toBe(200);
         expect(body).toEqual(expectedGetResponse);
@@ -53,9 +56,9 @@ describe("queue", () => {
         const postPayload = { "songIds": ["songId1"] };
         const expectedGetResponse = { "nodeIndexesAndSongIds": [[0, "songId1"]] };
 
-        const postResponse = await request(app).post(APIURL)
+        const postResponse = await request(app).post(POSTAPIURL)
           .send(postPayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
         
         expect(postResponse.status).toBe(201);
         expect(getResponse.status).toBe(200);
@@ -75,9 +78,9 @@ describe("queue", () => {
           [3, "songId4"]]
         };
 
-        const postResponse = await request(app).post(APIURL)
+        const postResponse = await request(app).post(POSTAPIURL)
           .send(postPayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
         
         expect(postResponse.status).toBe(201);
         expect(getResponse.status).toBe(200);
@@ -94,9 +97,9 @@ describe("queue", () => {
           [2, "songId6"]]
         };
 
-        const postResponse = await request(app).post(APIURL)
+        const postResponse = await request(app).post(POSTAPIURL)
           .send(postPayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
         
         expect(postResponse.status).toBe(201);
         expect(getResponse.status).toBe(200);
@@ -118,9 +121,9 @@ describe("queue", () => {
           [5, "songId6"]] 
         };
 
-        const postResponse = await request(app).post(APIURL)
+        const postResponse = await request(app).post(POSTAPIURL)
           .send(postPayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
         
         expect(postResponse.status).toBe(201);
         expect(getResponse.status).toBe(200);
@@ -143,9 +146,9 @@ describe("queue", () => {
           [6, "songId2"]]
         };
 
-        const postResponse = await request(app).post(APIURL)
+        const postResponse = await request(app).post(POSTAPIURL)
           .send(postPayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
         
         expect(postResponse.status).toBe(201);
         expect(getResponse.status).toBe(200);
@@ -165,9 +168,9 @@ describe("queue", () => {
           [2, "songId3"]]
         };
 
-        const deleteResponse = await request(app).delete(APIURL)
+        const deleteResponse = await request(app).delete(DELETEAPIURL)
           .send(deletePayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
 
         expect(deleteResponse.status).toBe(204);
         expect(getResponse.status).toBe(200);
@@ -180,9 +183,9 @@ describe("queue", () => {
         const deletePayload = { "nodeIndexesAndSongIds": { 0: "songId1" }};
         const expectedGetResponse = { "nodeIndexesAndSongIds": [] };
 
-        const deleteResponse = await request(app).delete(APIURL)
+        const deleteResponse = await request(app).delete(DELETEAPIURL)
           .send(deletePayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
 
         expect(deleteResponse.status).toBe(204);
         expect(getResponse.status).toBe(200);
@@ -204,9 +207,9 @@ describe("queue", () => {
           [6, "songId3"]]
         };
 
-        const deleteResponse = await request(app).delete(APIURL)
+        const deleteResponse = await request(app).delete(DELETEAPIURL)
           .send(deletePayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
 
         expect(deleteResponse.status).toBe(204);
         expect(getResponse.status).toBe(200);
@@ -225,9 +228,9 @@ describe("queue", () => {
           [6, "songId7"]]
         };
 
-        const deleteResponse = await request(app).delete(APIURL)
+        const deleteResponse = await request(app).delete(DELETEAPIURL)
           .send(deletePayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
 
         expect(deleteResponse.status).toBe(204);
         expect(getResponse.status).toBe(200);
@@ -240,9 +243,9 @@ describe("queue", () => {
         const deletePayload = { "nodeIndexesAndSongIds": { 0: "songId1", 2: "songId3", 4: "songId5", 5: "songId6" }};
         const expectedGetResponse = { "nodeIndexesAndSongIds": [] };
 
-        const deleteResponse = await request(app).delete(APIURL)
+        const deleteResponse = await request(app).delete(DELETEAPIURL)
           .send(deletePayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
 
         expect(deleteResponse.status).toBe(204);
         expect(getResponse.status).toBe(200);
@@ -293,9 +296,9 @@ describe("queue", () => {
           [24, "songId22"]]
         }
 
-        const deleteResponse = await request(app).delete(APIURL)
+        const deleteResponse = await request(app).delete(DELETEAPIURL)
           .send(deletePayload);
-        const getResponse = await request(app).get(APIURL);
+        const getResponse = await request(app).get(GETAPIURL);
 
         expect(deleteResponse.status).toBe(204);
         expect(getResponse.status).toBe(200);

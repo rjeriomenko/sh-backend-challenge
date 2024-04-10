@@ -15,23 +15,20 @@ const createQueuesRouter = () => {
   queuesRouter.get('/queues', (req, res) => {
     res.status(200)
       .json({ nodeIndexesAndSongIds: queue.returnQueue()});
-    // try and catch blocks with appropriate responses
   })
     
-  queuesRouter.post('/queues', (req, res) => {
+  queuesRouter.post('/queues/add-song', (req, res) => {
     const { songIds } = req.body;
     queue.enqueueSongs(songIds);
     res.status(201)
       .send();
-    // try and catch blocks with appropriate responses
   });
   
-  queuesRouter.delete('/queues', (req, res) => {
+  queuesRouter.delete('/queues/remove-song', (req, res) => {
     const { nodeIndexesAndSongIds } = req.body;
     queue.dequeueSongs(nodeIndexesAndSongIds);
     res.status(204)
       .send();
-    // try and catch blocks with appropriate responses
   });
 
   return queuesRouter;
