@@ -66,7 +66,7 @@ class Queue {
   }
 
   // O(n) where n is the size of the linked list.
-  // Return all songs in queue as an array of [index, songId] pairs.
+  // Return all songs in queue as an array of [nodeIndex, songId] pairs.
   // The array maintains the order from front of queue to back of queue,
   // allowing the frontend to easily iterate through entries and maintain order.
   returnQueue = () => {

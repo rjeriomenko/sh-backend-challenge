@@ -1,4 +1,5 @@
 // REST API Endpoints are in routers/queuesRouter.js
+// Unit tests are in __tests__/queuesRouter.test.js
 // Start server with "npm start"
 // Tests are run with "npm test"
 

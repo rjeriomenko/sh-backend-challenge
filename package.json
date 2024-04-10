@@ -3,7 +3,7 @@
     "express": "^4.19.2"
   },
   "scripts": {
-    "start": "node .\\app.js",
+    "start": "node app.js",
     "test": "jest --forceExit"
   },
   "devDependencies": {
